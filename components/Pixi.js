@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PIXI from "pixi.js";
-import gsap from 'gsap';
+import { TweenMax, Power3 } from 'gsap';
 
 class PixiComponent extends React.Component {
     state = { width: 0, height: 0 };
@@ -17,7 +17,7 @@ class PixiComponent extends React.Component {
     componentDidMount() {
         this.app = new PIXI.Application(window.innerWidth, window.innerHeight,
             {
-                backgroundColor: 0x10bb99
+                backgroundColor: 0xFFFFFF
             });
 
         // full screen
@@ -38,16 +38,25 @@ class PixiComponent extends React.Component {
             wordWrapWidth: 440
         });
 
-        console.log(this.app.view.width);
-        console.log(this.app.view.height);
+        // let texture = PIXI.utils.TextureCache["public/logo.svg"];
+        let logo = PIXI.Sprite.from('/logo.svg')
 
-        var richText = new PIXI.Text('Rich text with a lot of options and across multiple lines', style);
-        richText.x = this.state.width/2;
-        richText.y = this.state.height/2;
+        console.log(logo.width)
+        console.log(logo.height)
 
-        this.app.stage.addChild(richText);
+        // var richText = new PIXI.Text('Rich text with a lot of options and across multiple lines', style);
+        logo.anchor.set(0.5);
+        logo.x = window.innerWidth/2;
+        logo.y = window.innerHeight/2;
+
+        this.app.stage.addChild(logo);
 
         this.app.start();
+
+        TweenMax.set(logo, {alpha:0});
+        TweenMax.set(logo.scale, {x: 1.3, y: 1.3});
+        TweenMax.to(logo, 2.5, { alpha:1, ease: Power3.easeOut } );
+        TweenMax.to(logo.scale, 2.5, { x: 1, y: 1, ease: Power3.easeOut} );
 
         window.addEventListener('resize', this.updateDimensions);
     }
