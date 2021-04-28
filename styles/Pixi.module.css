@@ -1,0 +1,5 @@
+@font-face {
+    font-family: "mcsaatchi";
+    src: url("/mcsaatchiheavy.ttf");
+}
+/* todo: preload the font file to make it really work (or use svg) */
