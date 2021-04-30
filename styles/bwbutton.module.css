@@ -1,17 +1,25 @@
+@font-face {
+    font-family: "M&C Saatchi Grot";
+    src: url("/mcsaatchigrot-fivethree.ttf");
+}
+
 .bwbutton1{
+    display: inline-block;
     border: 1px solid #ffffff;
-    width: 150px;
-    height: 60px;
+    width: 160px;
+    height: 42px;
     text-align: center;
     background-color: transparent;
     border-radius: 0;
+    line-height: 40px;
     transition: background-color .3s, color .3s, border-radius .3s;
     color:#ffffff;
     box-sizing: border-box;
+    font-size: 12px;
 }
 .bwbutton1:hover{
     background-color:#ffffff;
-    border-radius: 5px;
+    border-radius: 6px;
     color: #000000;
 }
 @media screen and (min-width: 1px){

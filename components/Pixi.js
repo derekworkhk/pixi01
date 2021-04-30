@@ -32,81 +32,79 @@ class PixiComponent extends React.Component {
             that.gameCanvas.appendChild(that.app.view);
 
             let loader = that.app.loader;
-            function loaderDone(){
+            loader.add('/image_02.png');
+            loader.add('/logo2.svg');
+            loader.load(()=>{
                 // console.log('done loader')
 
+
+                ////////////////////// BG
                 let bg = new PIXI.Sprite(loader.resources["/image_02.png"].texture);
-
-                // console.log('bgw '+bg.width)
-                // console.log('bgh '+bg.height)
-
-                let widthScale = (window.innerWidth/bg.width)
-                let heightScale = (window.innerWidth/bg.height)
+                let widthScale = (that.app.screen.width/bg.width)
+                let heightScale = (that.app.screen.height/bg.height)
 
                 if (widthScale>=1&&heightScale>=1){
                     bg.scale.x=Math.min(widthScale,heightScale)
                 } else {
                     bg.scale.x=Math.max(widthScale,heightScale)
                 }
-
-
                 bg.x=0;
                 bg.y=window.innerHeight;
                 bg.anchor.x=0;
                 bg.anchor.y=1;
                 that.app.stage.addChild(bg);
 
-                var style = new PIXI.TextStyle({
-                    fontFamily: 'mcsaatchi',
-                    fontSize: 60,
-                    fontStyle: 'normal',
-                    fontWeight: 'bold',
-                    fill: '#ffffff',
-                    wordWrap: true,
-                    wordWrapWidth: 440
-                });
 
-                const container = new PIXI.Container();
-                container.x = that.app.screen.width / 2;
-                container.y = that.app.screen.height / 2;
+                ////////////////////// TEXT
+                let textArr = [];
 
-                var text1 = new PIXI.Text('HOLD MY BEER. CUDDLING WITH MY CAT', style);
-                // text1.anchor.set(0.5);
-                console.log('container w '+text1.width)
-                console.log('container h '+text1.height)
-                container.addChild(text1);
-                text1.y = text1.height;
-                container.pivot.x =text1.width / 2
-                container.pivot.y =text1.height / 2
-                // text1.alpha=0;
+                function lineOfText(text, fontSizePixel, yPercentUpTo50){
 
-                // let's create a moving shape
-                var thing = new PIXI.Graphics();
+                    const style = new PIXI.TextStyle({
+                        fontFamily: 'mcsaatchi',
+                        fontSize: fontSizePixel,
+                        fontStyle: 'normal',
+                        fontWeight: 'bold',
+                        fill: '#ffffff',
+                        wordWrap: true,
+                        wordWrapWidth: that.app.screen.width / 2
+                    });
+                    const container = new PIXI.Container();
+                    container.x = that.app.screen.width / 2;
+                    container.y = (that.app.screen.height / 2)+(that.app.screen.height*yPercentUpTo50/200);
 
-                thing.beginFill(0xFFFFFF, 0.5);
-                thing.x = that.app.screen.width / 2;
-                thing.y = that.app.screen.height / 2;
-                thing.drawRect(0, 0, 2, 2);
-                thing.width = container.width;
-                thing.height = container.height;
-                thing.pivot.x =1; // pivot pixel value is relative to drawRect size...
-                thing.pivot.y =1;
-                // thing.anchor.set(0.5);
+                    var textObj = new PIXI.Text(text, style);
 
-                that.app.stage.addChild(thing);
+                    container.addChild(textObj);
+                    textObj.y = textObj.height;
+                    container.pivot.x =textObj.width / 2
+                    container.pivot.y =textObj.height / 2
 
-                thing.beginFill(0x8bc5ff, 1);
-                thing.lineStyle(0);
-                thing.backgroundColor = 0xFF0000;
+                    var mask = new PIXI.Graphics();
+                    mask.x = container.x;
+                    mask.y = container.y;
+                    mask.lineStyle(0);
+                    mask.beginFill(0x000000, 0.1);
+                    mask.drawRect(0, 0, 2, 2);
+                    mask.width = container.width;
+                    mask.height = container.height;
+                    mask.pivot.x =1; // pivot pixel value is relative to drawRect size...
+                    mask.pivot.y =1;
 
-                container.mask = thing;
+                    that.app.stage.addChild(mask);
+                    container.mask = mask;
+                    that.app.stage.addChild(container);
+
+                    textArr.push(textObj);
+                }
+                lineOfText('M&CSAATCHISPENCER', 30, -33)
+                lineOfText('CUDDLING WITH MY PET,', 60, -9)
+                lineOfText('WE WILL BE DONE SOON', 60, 8)
 
 
-                that.app.stage.addChild(container);
-
-                // let logo = PIXI.Sprite.from('/logo.svg')
-
+                ////////////////////// LOGO
                 let logo = new PIXI.Sprite(loader.resources["/logo2.svg"].texture);
+                // let logo = PIXI.Sprite.from('/logo.svg')
                 // var tex = PIXI.Texture.from("/logo2.svg", {resourceOptions: {scale:1}});
                 // let logo = new PIXI.Sprite(tex);
                 // console.log('logow '+logo.width)
@@ -119,6 +117,11 @@ class PixiComponent extends React.Component {
                 logo.alpha=0;
                 that.app.stage.addChild(logo);
 
+                function mouseMoved(){
+                    console.log('mouse '+Math.random())
+                }
+                // container.on('mousemove', mouseMoved);
+
                 that.app.start();
 
                 // TweenMax.set(logo, {alpha:0});
@@ -128,7 +131,7 @@ class PixiComponent extends React.Component {
                 var tl = new TimelineMax({onComplete:timelineEnd});
                 tl.to(logo, 2.2, { alpha:1, ease: Power3.easeOut })
                     .to(logo, 1, {alpha:0, delay: 1.5, ease: Power3.easeOut})
-                    .to(text1, 1, { y: 0, ease: Power3.easeOut});
+                    .staggerTo(textArr, 1, { y: 0, ease: Power3.easeOut}, 0.1);
 
                 function timelineEnd(){
                     console.log('ended')
@@ -138,13 +141,7 @@ class PixiComponent extends React.Component {
 
                 window.addEventListener('resize', that.updateDimensions);
 
-            }
-            loader
-                .add('/image_02.png')
-                .add('/mcsaatchiheavy.ttf')
-                // .add('/logo.svg')
-                .add('/logo2.svg')
-                .load(loaderDone);
+            });
 
         });
 

@@ -7,7 +7,7 @@ function About() {
     }
     return <>
         <div>About page 101</div><Logo />
-        <div><Bwbutton click={doSomething}>hahahahaah</Bwbutton></div>
+        <div><Bwbutton click={doSomething}>Contact us now?</Bwbutton></div>
     </>
 }
 
