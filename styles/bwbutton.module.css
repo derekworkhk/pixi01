@@ -2,25 +2,66 @@
     font-family: "M&C Saatchi Grot";
     src: url("/mcsaatchigrot-fivethree.ttf");
 }
-
+.a{
+    display: block;
+}
 .bwbutton1{
+    cursor: pointer;
     display: inline-block;
     border: 1px solid #ffffff;
     width: 160px;
     height: 42px;
-    text-align: center;
     background-color: transparent;
     border-radius: 0;
-    line-height: 40px;
     transition: background-color .3s, color .3s, border-radius .3s;
     color:#ffffff;
     box-sizing: border-box;
-    font-size: 12px;
+    position: relative;
+    overflow: hidden;
 }
 .bwbutton1:hover{
-    background-color:#ffffff;
     border-radius: 6px;
     color: #000000;
+}
+.staticInner{
+    position: relative;
+    font-family: "M&C Saatchi Grot";
+    display: inline-block;
+    width: 160px;
+    height: 42px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 14px;
+}
+.hoverInner{
+    position: relative;
+    font-family: "M&C Saatchi Grot";
+    display: none;
+    width: 160px;
+    height: 42px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 14px;
+}
+.bwbutton1:hover .staticInner{
+    display: none;
+}
+.bwbutton1:hover .hoverInner{
+    display: inline-block;
+}
+.wbackground{
+    background-color:#ffffff;
+    height: 42px;
+    width: 160px;
+    position: absolute;
+    top:0;
+    left:0;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform .4s;
+}
+.bwbutton1:hover .wbackground{
+    transform: scaleX(1)
 }
 @media screen and (min-width: 1px){
 

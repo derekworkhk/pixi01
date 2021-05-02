@@ -3,5 +3,7 @@
     height:45px;
     width:100%;
     text-align: center;
-    top: 65%;
+    top: calc(50% + 150px);
+    opacity: 0;
+    display: none;
 }
