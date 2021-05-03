@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PIXI from "pixi.js";
-import { TweenMax, TimelineMax, Power3 } from 'gsap';
+import { TweenMax, TimelineMax, Power2, Power3 } from 'gsap';
 import '../styles/Pixi.module.css'
 var FontFaceObserver = require('fontfaceobserver');
 
@@ -24,6 +24,7 @@ class PixiComponent extends React.Component {
         var font = new FontFaceObserver('mcsaatchi');
         font.load().then(function () {
             // console.log('My font family has loaded');
+
             that.app = new PIXI.Application(1920, 1080);
 
             // full screen
@@ -91,6 +92,78 @@ class PixiComponent extends React.Component {
 
 
                 ////////////////////// TEXT
+
+                let redChannelFilter = new PIXI.filters.ColorMatrixFilter();
+                redChannelFilter.matrix = [
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                ];
+                let greenChannelFilter = new PIXI.filters.ColorMatrixFilter();
+                greenChannelFilter.matrix = [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                ];
+                let blueChannelFilter = new PIXI.filters.ColorMatrixFilter();
+                blueChannelFilter.matrix = [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                ];
+
+
                 let textArr = [];
                 let resizeFunArr = [];
 
@@ -103,27 +176,44 @@ class PixiComponent extends React.Component {
                         fontWeight: 'bold',
                         fill: '#ffffff',
                         wordWrap: true,
-                        wordWrapWidth: that.app.screen.width / 2
+                        wordWrapWidth: that.app.screen.width-50
                     });
                     const container = new PIXI.Container();
                     container.x = that.app.screen.width / 2;
-                    container.y = (that.app.screen.height / 2)+yPixel;
+                    container.y = (that.app.screen.height / 2) + yPixel;
 
                     var textObj = new PIXI.Text(text, style);
+                    var textObjGreen = new PIXI.Text(text, style);
+                    var textObjBlue = new PIXI.Text(text, style);
 
-                    container.addChild(textObj);
-                    textObj.y = textObj.height;
+                    const containner = new PIXI.Container();
+                    containner.x=0;
+                    containner.y=textObj.height+49;
+                    container.addChild(containner)
+                    containner.addChild(textObj)
+                    // container.addChild(textObj);
+                    // textObj.y = textObj.height+1;
                     container.pivot.x =textObj.width / 2
                     container.pivot.y =textObj.height / 2
+                    containner.addChild(textObjGreen)
+                    containner.addChild(textObjBlue)
+                    textObj.filters = [redChannelFilter];
+                    textObjGreen.filters = [greenChannelFilter];
+                    textObjBlue.filters = [blueChannelFilter];
+                    textObjGreen.filters[0].blendMode = PIXI.BLEND_MODES.ADD;
+                    textObjBlue.filters[0].blendMode = PIXI.BLEND_MODES.ADD;
+                    textObjGreen.x=3;
+                    textObjBlue.x=5;
+
 
                     var mask = new PIXI.Graphics();
                     mask.x = container.x;
                     mask.y = container.y;
                     mask.lineStyle(0);
-                    mask.beginFill(0x000000, 0.1);
+                    mask.beginFill(0x000000, 0.5);
                     mask.drawRect(0, 0, 2, 2);
-                    mask.width = container.width;
-                    mask.height = container.height;
+                    mask.width = container.width+35;
+                    mask.height = container.height+35;
                     mask.pivot.x =1; // pivot pixel value is relative to drawRect size...
                     mask.pivot.y =1;
 
@@ -131,7 +221,7 @@ class PixiComponent extends React.Component {
                     container.mask = mask;
                     that.app.stage.addChild(container);
 
-                    textArr.push(textObj);
+                    textArr.push(containner);
                     let resizeFun = function(){
 
                         container.x = that.app.screen.width / 2;
@@ -170,20 +260,77 @@ class PixiComponent extends React.Component {
                 logo.alpha=0;
                 that.app.stage.addChild(logo);
 
-                function mouseMoved(){
-                    console.log('mouse '+Math.random())
-                }
-                // container.on('mousemove', mouseMoved);
+                // draw a rectangle
+                // var rect = new PIXI.Graphics();
+                // rect.beginFill(0xFFFF00);
+                // rect.drawRect(0, 0, 5, 5);
+                // that.app.stage.addChild(rect);
+                // rect.pivot.x=3;
+                // rect.pivot.y=3;
+
+                let rectX = that.app.screen.width / 2;
+                let rectY = that.app.screen.height / 2;
+
+                // rect.x=rectX;
+                // rect.y=rectY;
+
+                ///////////// mouse event
+                that.app.stage.interactive = true;
+                let cursorMomentum = 0.14;
+                let mouseX = that.app.screen.width / 2;
+                let mouseY = that.app.screen.height / 2;
+                that.app.stage.on("pointermove", (ev) => {
+                    mouseX = ev.data.global.x;
+                    mouseY = ev.data.global.y;
+
+                });
+                let count=0;
+                that.app.ticker.add(function(delta) {
+                    if(++count>1){
+                        count=0;
+                    } else {
+                        rectX = Math.floor((rectX+mouseX)/2)
+                        rectY = Math.floor((rectY+mouseY)/2)
+
+                        // rect.x=rectX;
+                        // rect.y=rectY;
+                        let diffX = rectX-mouseX;
+                        if (diffX>300) diffX=300;
+                        else if (diffX<-300) diffX=-300;
+                        let diffY = rectY-mouseY;
+                        if (diffY>300) diffY=300
+                        else if (diffY<-300) diffY=-300
+
+
+                        textArr.forEach((textStack, index)=>{
+                            let factor=1;
+                            if (index===0){
+                                factor=0.5
+                            }
+
+                            textStack.children[0].x = diffX*0.1*factor
+                            textStack.children[0].y = diffY*0.1*factor
+
+                            textStack.children[1].x = diffX*(diffX>0?0.09:0.11)*factor
+                            textStack.children[1].y = diffY*(diffY>0?0.09:0.11)*factor
+
+                            textStack.children[2].x = diffX*(diffX>0?0.11:0.09)*factor
+                            textStack.children[2].y = diffY*(diffY>0?0.11:0.09)*factor
+
+                        });
+                    }
+
+                });
 
                 that.app.start();
 
                 // TweenMax.set(logo, {alpha:0});
                 // TweenMax.to(logo, 2.2, { alpha:1, ease: Power3.easeOut } );
-                TweenMax.to(logo.scale, 2.2, { x: 0.3, y: 0.3, ease: Power3.easeOut} );
+                TweenMax.to(logo.scale, 3, { x: 0.3, y: 0.3, ease: Power2.easeOut} );
 
                 var tl = new TimelineMax({onComplete:timelineEnd});
-                tl.to(bg, 0.5, { alpha: 1 } );
-                tl.to(logo, 2.2, { alpha:1, ease: Power3.easeOut })
+                tl.to(bg, 0.5, { alpha: 1 } )
+                    .to(logo, 3, { alpha:1, ease: Power2.easeOut })
                     .to(logo, 1, {alpha:0, delay: 1.5, ease: Power3.easeOut})
                     .staggerTo(textArr, 1, { y: 0, ease: Power3.easeOut}, 0.1);
 
@@ -201,14 +348,8 @@ class PixiComponent extends React.Component {
                 };
 
                 window.addEventListener('resize', resizeChain);
-
             });
-
         });
-
-
-
-
     }
 
     componentWillUnmount() {
