@@ -19,11 +19,15 @@ class PixiComponent extends React.Component {
     }
 
     componentDidMount() {
+        let isMobile = false;
+        if(Math.max(window.innerWidth, window.innerHeight)<=767)
+            isMobile = true;
+
         let that = this;
 
         var font = new FontFaceObserver('mcsaatchi');
         font.load().then(function () {
-            // console.log('My font family has loaded');
+            console.log('My font family has loaded');
 
             that.app = new PIXI.Application(1920, 1080);
 
@@ -31,6 +35,7 @@ class PixiComponent extends React.Component {
             that.app.renderer.view.style.position = "absolute";
             that.app.renderer.view.style.display = "block";
             that.app.renderer.autoResize = true;
+            that.app.renderer.antialias = true;
             that.app.renderer.resize(window.innerWidth, window.innerHeight);
             let appResize = function(){
                 that.app.renderer.resize(window.innerWidth, window.innerHeight);
@@ -47,8 +52,8 @@ class PixiComponent extends React.Component {
 
                 ////////////////////// BG
                 let bg = new PIXI.Sprite(loader.resources["/image_02.png"].texture);
-                let widthScale = ((bg.width)/that.app.screen.width)
-                let heightScale = ((bg.height)/that.app.screen.height)
+                let widthScale = (bg.width/that.app.screen.width)
+                let heightScale = (bg.height/that.app.screen.height)
 
                 let finalScale=1;
                 if (widthScale<1&&heightScale<1){
@@ -168,7 +173,7 @@ class PixiComponent extends React.Component {
                 let textArr = [];
                 let resizeFunArr = [];
 
-                function lineOfText(text, fontSizePixel, yPixel){
+                function lineOfText(text, fontSizePixel, yPixel, xPos='center'){
 
                     const style = new PIXI.TextStyle({
                         fontFamily: 'mcsaatchi',
@@ -177,10 +182,15 @@ class PixiComponent extends React.Component {
                         fontWeight: 'bold',
                         fill: '#ffffff',
                         wordWrap: true,
+                        letterSpacing: 1,
                         wordWrapWidth: that.app.screen.width-50
                     });
                     const container = new PIXI.Container();
-                    container.x = that.app.screen.width / 2;
+                    if(xPos=='left'){
+                        container.x = 25;
+                    } else{
+                        container.x = that.app.screen.width / 2;
+                    }
                     container.y = (that.app.screen.height / 2) + yPixel;
 
                     var textObj = new PIXI.Text(text, style);
@@ -194,7 +204,11 @@ class PixiComponent extends React.Component {
                     containner.addChild(textObj)
                     // container.addChild(textObj);
                     // textObj.y = textObj.height+1;
-                    container.pivot.x =textObj.width / 2
+                    if(xPos=='left'){
+                        container.pivot.x = 0
+                    } else{
+                        container.pivot.x =textObj.width / 2
+                    }
                     container.pivot.y =textObj.height / 2
                     containner.addChild(textObjGreen)
                     containner.addChild(textObjBlue)
@@ -215,7 +229,11 @@ class PixiComponent extends React.Component {
                     mask.drawRect(0, 0, 2, 2);
                     mask.width = container.width+35;
                     mask.height = container.height+35;
-                    mask.pivot.x =1; // pivot pixel value is relative to drawRect size...
+                    if(xPos=='left') {
+                        mask.pivot.x = 0;
+                    }else{
+                        mask.pivot.x =1; // pivot pixel value is relative to drawRect size...
+                    }
                     mask.pivot.y =1;
 
                     that.app.stage.addChild(mask);
@@ -232,9 +250,17 @@ class PixiComponent extends React.Component {
                     }
                     resizeFunArr.push(resizeFun)
                 }
-                lineOfText('M&CSAATCHISPENCER', 30, -165)
-                lineOfText('CUDDLING WITH MY PET,', 60, -50)
-                lineOfText('WE WILL BE DONE SOON', 60, 50)
+                if(isMobile){
+                    lineOfText('M&CSAATCHISPENCER', 20, -160, 'left')
+                    lineOfText('CUDDLING WITH', 40, -60, 'left')
+                    lineOfText('MY PET, WE WILL', 40, 0, 'left')
+                    lineOfText('BE DONE SOON.', 40, 60, 'left')
+                } else {
+                    lineOfText('M&CSAATCHISPENCER', 30, -165)
+                    lineOfText('CUDDLING WITH MY PET,', 60, -50)
+                    lineOfText('WE WILL BE DONE SOON.', 60, 50)
+                }
+
 
                 let textRepos = function(){
                     resizeFunArr.forEach((thisTextReposFun)=>{
@@ -269,8 +295,8 @@ class PixiComponent extends React.Component {
                 // rect.pivot.x=3;
                 // rect.pivot.y=3;
 
-                let rectX = that.app.screen.width / 2;
-                let rectY = that.app.screen.height / 2;
+                let rectX = Math.floor(that.app.screen.width / 2);
+                let rectY = Math.floor(that.app.screen.height / 2);
 
                 // rect.x=rectX;
                 // rect.y=rectY;
@@ -278,11 +304,11 @@ class PixiComponent extends React.Component {
                 ///////////// mouse event
                 that.app.stage.interactive = true;
                 let cursorMomentum = 0.14;
-                let mouseX = that.app.screen.width / 2;
-                let mouseY = that.app.screen.height / 2;
+                let mouseX = Math.floor(that.app.screen.width / 2);
+                let mouseY = Math.floor(that.app.screen.height / 2);
                 that.app.stage.on("pointermove", (ev) => {
-                    mouseX = ev.data.global.x;
-                    mouseY = ev.data.global.y;
+                    mouseX = Math.floor(ev.data.global.x);
+                    mouseY = Math.floor(ev.data.global.y);
 
                 });
                 let count=0;
@@ -313,11 +339,11 @@ class PixiComponent extends React.Component {
                                     factor = 0.5
                                 }
 
-                                textStack.children[0].x = diffX * 0.1 * factor
-                                textStack.children[0].y = diffY * 0.1 * factor
+                                textStack.children[0].x = diffX * (diffX > 0 ? 0.08 : 0.12) * factor
+                                textStack.children[0].y = diffY * (diffY > 0 ? 0.08 : 0.12) * factor
 
-                                textStack.children[1].x = diffX * (diffX > 0 ? 0.08 : 0.12) * factor
-                                textStack.children[1].y = diffY * (diffY > 0 ? 0.08 : 0.12) * factor
+                                textStack.children[1].x = diffX * 0.1 * factor
+                                textStack.children[1].y = diffY * 0.1 * factor
 
                                 textStack.children[2].x = diffX * (diffX > 0 ? 0.12 : 0.08) * factor
                                 textStack.children[2].y = diffY * (diffY > 0 ? 0.12 : 0.08) * factor

@@ -9,7 +9,7 @@ const Pixi = dynamic(import('../components/Pixi'), {ssr: false})
 
 export default function Home() {
     let buttonProp = {
-        'staticText': 'Contact us now?',
+        'staticText': "Can't Wait?",
         'hoverText': 'Email',
         'clickType': 'link',
         'link': 'mailto:spencer@mcsaatchi.com'
