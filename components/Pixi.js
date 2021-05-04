@@ -47,8 +47,8 @@ class PixiComponent extends React.Component {
 
                 ////////////////////// BG
                 let bg = new PIXI.Sprite(loader.resources["/image_02.png"].texture);
-                let widthScale = (bg.width/that.app.screen.width)
-                let heightScale = (bg.height/that.app.screen.height)
+                let widthScale = ((bg.width)/that.app.screen.width)
+                let heightScale = ((bg.height)/that.app.screen.height)
 
                 let finalScale=1;
                 if (widthScale<1&&heightScale<1){
@@ -60,10 +60,11 @@ class PixiComponent extends React.Component {
                 } else{
                     finalScale=1/heightScale
                 }
-                bg.scale.x=finalScale;
-                bg.scale.y=finalScale;
+                let littleMoreFactor=(bg.width+20)/bg.width
+                bg.scale.x=finalScale*littleMoreFactor;
+                bg.scale.y=finalScale*littleMoreFactor;
 
-                bg.x=0;
+                bg.x=-10;
                 bg.y=that.app.screen.height;
                 bg.alpha=0;
                 let bgResize=function(){
@@ -289,35 +290,40 @@ class PixiComponent extends React.Component {
                     if(++count>1){
                         count=0;
                     } else {
-                        rectX = Math.floor((rectX+mouseX)/2)
-                        rectY = Math.floor((rectY+mouseY)/2)
+                        bg.x = ((2*mouseX / that.app.screen.width)-1)*5-10 //0 ~ -20
 
-                        // rect.x=rectX;
-                        // rect.y=rectY;
-                        let diffX = rectX-mouseX;
-                        if (diffX>300) diffX=300;
-                        else if (diffX<-300) diffX=-300;
-                        let diffY = rectY-mouseY;
-                        if (diffY>300) diffY=300
-                        else if (diffY<-300) diffY=-300
+                        if (rectX != mouseX || rectY != mouseY) {
+
+                            rectX = Math.floor((rectX + mouseX) / 2)
+                            rectY = Math.floor((rectY + mouseY) / 2)
+
+                            // rect.x=rectX;
+                            // rect.y=rectY;
+                            let diffX = rectX - mouseX;
+                            if (diffX > 300) diffX = 300;
+                            else if (diffX < -300) diffX = -300;
+                            let diffY = rectY - mouseY;
+                            if (diffY > 300) diffY = 300
+                            else if (diffY < -300) diffY = -300
 
 
-                        textArr.forEach((textStack, index)=>{
-                            let factor=1;
-                            if (index===0){
-                                factor=0.5
-                            }
+                            textArr.forEach((textStack, index) => {
+                                let factor = 1;
+                                if (index === 0) {
+                                    factor = 0.5
+                                }
 
-                            textStack.children[0].x = diffX*0.1*factor
-                            textStack.children[0].y = diffY*0.1*factor
+                                textStack.children[0].x = diffX * 0.1 * factor
+                                textStack.children[0].y = diffY * 0.1 * factor
 
-                            textStack.children[1].x = diffX*(diffX>0?0.09:0.11)*factor
-                            textStack.children[1].y = diffY*(diffY>0?0.09:0.11)*factor
+                                textStack.children[1].x = diffX * (diffX > 0 ? 0.08 : 0.12) * factor
+                                textStack.children[1].y = diffY * (diffY > 0 ? 0.08 : 0.12) * factor
 
-                            textStack.children[2].x = diffX*(diffX>0?0.11:0.09)*factor
-                            textStack.children[2].y = diffY*(diffY>0?0.11:0.09)*factor
+                                textStack.children[2].x = diffX * (diffX > 0 ? 0.12 : 0.08) * factor
+                                textStack.children[2].y = diffY * (diffY > 0 ? 0.12 : 0.08) * factor
 
-                        });
+                            });
+                        }
                     }
 
                 });
